@@ -7,6 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build-and-deploy:
@@ -18,10 +19,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set repository name to lowercase
-        id: repo_name
-        run: echo "IMAGE_NAME=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -37,7 +34,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ steps.repo_name.outputs.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=latest
             type=sha,prefix={{branch}}-
@@ -50,8 +47,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ steps.repo_name.outputs.IMAGE_NAME }}:buildcache
-          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ steps.repo_name.outputs.IMAGE_NAME }}:buildcache,mode=max
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
 
       - name: Deploy to server via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -64,10 +61,10 @@ jobs:
             cd /root/twitter-api
 
             # Pull latest images
-            docker-compose -f scripts/docker-compose.yml -f scripts/docker-compose.prod.yml pull twitter-api
+            docker compose -f scripts/docker-compose.yml -f scripts/docker-compose.prod.yml pull twitter-api
 
-            docker-compose -f scripts/docker-compose.yml -f scripts/docker-compose.prod.yml build --no-cache
-            docker-compose -f scripts/docker-compose.yml -f scripts/docker-compose.prod.yml up -d
+            docker compose -f scripts/docker-compose.yml -f scripts/docker-compose.prod.yml build --no-cache
+            docker compose -f scripts/docker-compose.yml -f scripts/docker-compose.prod.yml up -d
 
             # Clean up old images
             docker image prune -f
