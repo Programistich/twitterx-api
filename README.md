@@ -11,7 +11,7 @@ cp scripts/.env.example .env
 
 # 2. Run
 cd scripts
-docker-compose up -d
+docker compose -f scripts/docker-compose.yml --env-file scripts/.env up -d
 
 # 3. API available at http://localhost:8080
 ```

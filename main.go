@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 
 	"github.com/gorilla/mux"
-	"github.com/joho/godotenv"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"twitter-api/internal/service"
 )
@@ -92,11 +91,6 @@ func makeGetUserHandler(fxTwitterService *service.FxTwitterService) http.Handler
 }
 
 func main() {
-	// Load .env file
-	if err := godotenv.Load(); err != nil {
-		log.Printf("Warning: Error loading .env file: %v", err)
-	}
-
 	// Get Nitter URL from environment
 	nitterURL := os.Getenv("NITTER_URL")
 	if nitterURL == "" {
@@ -128,11 +122,11 @@ func main() {
 		httpSwagger.DomID("swagger-ui"),
 	))
 
-	port := "127.0.0.1:8080"
-	fmt.Printf("Server starting on http://%s\n", port)
+	port := ":8080"
+	fmt.Printf("Server starting on http://0.0.0.0%s\n", port)
 	fmt.Printf("Using Nitter instance: %s\n", nitterURL)
-	fmt.Printf("Swagger UI available at: http://%s/\n", port)
-	fmt.Printf("OpenAPI spec available at: http://%s/openapi.yaml\n", port)
+	fmt.Printf("Swagger UI available at: http://localhost%s/\n", port)
+	fmt.Printf("OpenAPI spec available at: http://localhost%s/openapi.yaml\n", port)
 	log.Fatal(http.ListenAndServe(port, router))
 }
 

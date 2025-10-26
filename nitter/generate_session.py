@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import re
 import requests
 import json
 import sys
@@ -211,10 +212,23 @@ if __name__ == "__main__":
     print(f"OTP Secret configured: {bool(otp_secret)}")
     print()
 
-    result = auth(username, password, otp_secret)
+    try:
+        result = auth(username, password, otp_secret)
+    except Exception as e:
+        result = None
+
     if result is None:
         print("Authentication failed.")
-        sys.exit(1)
+
+        # read file
+        with open(path, "r") as f:
+            sessions = [json.loads(line) for line in f]
+            if len(sessions) > 0:
+                print(f"Sessions loaded: {len(sessions)}")
+                sys.exit(0)
+            else:
+                print("No sessions found.")
+                sys.exit(1)
 
     print(f"Auth result: {result}")
 
