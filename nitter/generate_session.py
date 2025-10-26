@@ -222,9 +222,9 @@ if __name__ == "__main__":
 
         # read file
         with open(path, "r") as f:
-            sessions = [json.loads(line) for line in f]
-            if len(sessions) > 0:
-                print(f"Sessions loaded: {len(sessions)}")
+            lines = f.readlines()
+            if len(lines) > 0:
+                print(f"Sessions loaded: {len(lines)}")
                 sys.exit(0)
             else:
                 print("No sessions found.")
