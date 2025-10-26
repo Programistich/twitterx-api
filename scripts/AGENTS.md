@@ -101,11 +101,17 @@ The project uses GitHub Actions for continuous deployment to production servers:
 **Trigger**: Automatic deployment on push to `main` branch
 
 **Pipeline steps**:
-1. **Build**: Docker image is built using `scripts/Dockerfile`
-2. **Push**: Image is pushed to GitHub Container Registry (GHCR) at `ghcr.io/programistich/twitter-api:latest`
-3. **Deploy**: SSH connection to production server
-4. **Update**: Pull latest image and restart services
-5. **Cleanup**: Remove old unused Docker images
+1. **Setup**: Configure Docker Buildx for advanced build features
+2. **Build**: Docker image is built using `scripts/Dockerfile` with layer caching
+3. **Push**: Image is pushed to GitHub Container Registry (GHCR) at `ghcr.io/programistich/twitter-api:latest`
+4. **Deploy**: SSH connection to production server
+5. **Update**: Pull latest image and restart services
+6. **Cleanup**: Remove old unused Docker images
+
+**Build optimization**:
+- Docker layer caching is enabled using GitHub Container Registry
+- Cache is stored at `ghcr.io/programistich/twitter-api:buildcache`
+- Subsequent builds reuse unchanged layers for faster deployment
 
 ### Production Deployment
 
