@@ -74,7 +74,7 @@ services:
       dockerfile: scripts/Dockerfile
     container_name: twitter-api
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     environment:
       - NITTER_URL
       - TWITTER_USERNAME
