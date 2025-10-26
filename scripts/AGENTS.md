@@ -126,6 +126,7 @@ Configure these secrets in your GitHub repository settings (Settings → Secrets
 - `SSH_HOST` - Production server IP address or hostname
 - `SSH_USER` - SSH username for deployment
 - `SSH_PRIVATE_KEY` - SSH private key for authentication (full content, including BEGIN/END markers)
+- `SSH_PORT` - SSH port for connection (e.g., 22 or custom port)
 
 The deployment expects the project to be located at `/root/twitter-api` on the production server.
 

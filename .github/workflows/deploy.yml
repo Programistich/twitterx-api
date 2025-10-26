@@ -51,14 +51,15 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
           script: |
             cd /root/twitter-api
 
             # Pull latest images
             docker-compose -f scripts/docker-compose.yml -f scripts/docker-compose.prod.yml pull twitter-api
 
-            # Restart only the twitter-api service
-            docker-compose -f scripts/docker-compose.yml -f scripts/docker-compose.prod.yml up -d --no-deps twitter-api
+            docker-compose -f scripts/docker-compose.yml -f scripts/docker-compose.prod.yml build --no-cache
+            docker-compose -f scripts/docker-compose.yml -f scripts/docker-compose.prod.yml up -d
 
             # Clean up old images
             docker image prune -f
