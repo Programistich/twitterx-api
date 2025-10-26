@@ -1,0 +1,7 @@
+**/.venv/
+.env
+nitter/sessions.jsonl
+
+main
+twitter-api
+go.sum
