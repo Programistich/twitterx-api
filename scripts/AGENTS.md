@@ -90,6 +90,57 @@ All paths in docker-compose.yml are relative to the scripts directory:
 - `8049` - Nitter instance (bound to localhost only)
 - Redis runs on internal network only
 
+## CI/CD and Deployment
+
+### GitHub Actions Workflow
+
+The project uses GitHub Actions for continuous deployment to production servers:
+
+**Workflow file**: `.github/workflows/deploy.yml`
+
+**Trigger**: Automatic deployment on push to `main` branch
+
+**Pipeline steps**:
+1. **Build**: Docker image is built using `scripts/Dockerfile`
+2. **Push**: Image is pushed to GitHub Container Registry (GHCR) at `ghcr.io/programistich/twitter-api:latest`
+3. **Deploy**: SSH connection to production server
+4. **Update**: Pull latest image and restart services
+5. **Cleanup**: Remove old unused Docker images
+
+### Production Deployment
+
+**docker-compose.prod.yml** - Production override configuration:
+- Replaces local build with pre-built GHCR image
+- Always pulls the latest image version
+- Used in combination with main docker-compose.yml
+
+**Production usage**:
+```bash
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+```
+
+### Required GitHub Secrets
+
+Configure these secrets in your GitHub repository settings (Settings → Secrets and variables → Actions):
+
+- `SSH_HOST` - Production server IP address or hostname
+- `SSH_USER` - SSH username for deployment
+- `SSH_PRIVATE_KEY` - SSH private key for authentication (full content, including BEGIN/END markers)
+
+The deployment expects the project to be located at `/root/twitter-api` on the production server.
+
+### Image Registry
+
+Production images are stored in GitHub Container Registry:
+- Registry: `ghcr.io`
+- Image: `ghcr.io/programistich/twitter-api:latest`
+- Authentication: Automatic via `GITHUB_TOKEN`
+
+To manually pull the production image:
+```bash
+docker pull ghcr.io/programistich/twitter-api:latest
+```
+
 ## API Documentation
 
 The Twitter API includes built-in Swagger UI documentation:
