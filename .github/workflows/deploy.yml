@@ -63,6 +63,8 @@ jobs:
           script: |
             cd /root/twitter-api
 
+            git pull origin main
+
             # Pull latest images
             docker compose -f scripts/docker-compose.yml -f scripts/docker-compose.prod.yml pull twitter-api
 
