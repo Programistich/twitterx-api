@@ -41,7 +41,7 @@ services:
       - twitter-net
 
   nitter:
-    image: zedeus/nitter:latest-arm64
+    image: ${NITTER_IMAGE:-zedeus/nitter:latest-arm64}
     container_name: nitter
     ports:
       - "127.0.0.1:8049:8049"
