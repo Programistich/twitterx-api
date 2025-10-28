@@ -13,7 +13,9 @@ This directory contains all CI/CD, deployment, and configuration files for the T
   - `TWITTER_USERNAME` - Twitter account username for Nitter session generation
   - `TWITTER_PASSWORD` - Twitter account password
   - `TWITTER_OTP_SECRET` - 2FA secret key for Twitter account
-  - `NITTER_URL` - URL of your running Nitter instance (e.g., `http://127.0.0.1:8049`)
+  - `NITTER_URL` - URL of your running Nitter instance
+    - Docker: `http://nitter:8049` (use container name)
+    - Local: `http://127.0.0.1:8049` (use localhost)
 
 ### Docker Configuration
 - `Dockerfile` - Multi-stage Docker build configuration for the Twitter API
@@ -58,7 +60,10 @@ cp scripts/.env.example .env
 TWITTER_USERNAME=your_twitter_username
 TWITTER_PASSWORD=your_twitter_password
 TWITTER_OTP_SECRET=your_2fa_secret_key
-NITTER_URL=http://127.0.0.1:8049
+# For Docker deployment:
+NITTER_URL=http://nitter:8049
+# For local development:
+# NITTER_URL=http://127.0.0.1:8049
 ```
 
 ### Service Dependencies

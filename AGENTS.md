@@ -25,7 +25,9 @@ The API is documented using **OpenAPI 3.0.3** specification:
 ## Environment Configuration
 
 Required environment variables (create `.env` from `scripts/.env.example`):
-- `NITTER_URL` - URL of your running Nitter instance (e.g., `http://127.0.0.1:8049`)
+- `NITTER_URL` - URL of your running Nitter instance
+  - Docker: `http://nitter:8049` (use container name)
+  - Local: `http://127.0.0.1:8049` (use localhost)
 - `TWITTER_USERNAME` - Twitter account username for Nitter session generation
 - `TWITTER_PASSWORD` - Twitter account password
 - `TWITTER_OTP_SECRET` - 2FA secret key for Twitter account

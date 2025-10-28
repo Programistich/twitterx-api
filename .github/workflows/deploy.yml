@@ -79,3 +79,18 @@ jobs:
 
             # Clean up old images (remove unused images older than 48h)
             docker image prune -af --filter "until=48h"
+
+            # Restart caddy
+            cd /root/caddy
+            docker restart caddy
+
+      - name: Reload Caddy configuration
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            set -e
+            docker exec caddy caddy reload --config /etc/caddy/Caddyfile
