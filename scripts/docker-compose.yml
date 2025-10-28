@@ -96,4 +96,5 @@ networks:
   twitter-net:
     name: twitter_shared_network
   caddynet:
+    name: caddy_caddynet
     external: true
