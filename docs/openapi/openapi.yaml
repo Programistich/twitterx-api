@@ -6,6 +6,10 @@ info:
   contact:
     name: API Support
 
+servers:
+  - url: /api
+    description: Main API server
+
 paths:
   /users/{username}:
     get:

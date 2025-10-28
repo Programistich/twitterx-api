@@ -12,8 +12,9 @@ This is a REST API written in Go that fetches Twitter user data by combining two
 
 The API is documented using **OpenAPI 3.0.3** specification:
 - **Location**: `docs/openapi/openapi.yaml` - The source of truth for API documentation
-- **Swagger UI**: Integrated at `/` endpoint for interactive documentation
-- **Spec endpoint**: `/openapi.yaml` serves the specification file
+- **Swagger UI**: Integrated at `/api/docs/` endpoint for interactive documentation
+- **Spec endpoint**: `/api/openapi.yaml` serves the specification file
+- **Base Path**: All API endpoints are prefixed with `/api/`
 
 ### When Adding New Features
 **IMPORTANT**: When adding new endpoints or modifying existing ones:
@@ -39,15 +40,15 @@ For deployment and CI/CD configuration, see `scripts/AGENTS.md`
 ### Request Flow
 
 **User Profile Flow:**
-1. Client requests user profile via `/users/{username}`
+1. Client requests user profile via `/api/users/{username}`
 2. API queries FxTwitter API with the username
 3. User profile data is returned to client
 
 **Tweets Flow:**
-1. Client requests tweets from a user via `/users/{username}/tweets`
+1. Client requests tweets from a user via `/api/users/{username}/tweets`
 2. API fetches the user's RSS feed from Nitter instance
 3. RSS parser extracts tweet IDs from the feed
-4. Client requests specific tweet details via `/users/{username}/tweets/{id}`
+4. Client requests specific tweet details via `/api/users/{username}/tweets/{id}`
 5. API queries FxTwitter API with the tweet ID
 6. Tweet data is returned to client
 

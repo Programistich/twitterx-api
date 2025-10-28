@@ -107,21 +107,21 @@ func main() {
 	router := mux.NewRouter()
 
 	// API endpoints (register specific routes first)
-	router.HandleFunc("/users/{username}/tweets/{id}", makeGetTweetHandler(fxTwitterService)).Methods("GET")
-	router.HandleFunc("/users/{username}/tweets", makeGetUserTweetsHandler(nitterService)).Methods("GET")
-	router.HandleFunc("/users/{username}", makeGetUserHandler(fxTwitterService)).Methods("GET")
+	router.HandleFunc("/api/users/{username}/tweets/{id}", makeGetTweetHandler(fxTwitterService)).Methods("GET")
+	router.HandleFunc("/api/users/{username}/tweets", makeGetUserTweetsHandler(nitterService)).Methods("GET")
+	router.HandleFunc("/api/users/{username}", makeGetUserHandler(fxTwitterService)).Methods("GET")
 
 	// OpenAPI spec endpoint
-	router.HandleFunc("/openapi.yaml", serveOpenAPISpec).Methods("GET")
+	router.HandleFunc("/api/openapi.yaml", serveOpenAPISpec).Methods("GET")
 
 	// Root redirect to docs
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/docs/", http.StatusMovedPermanently)
+		http.Redirect(w, r, "/api/docs/", http.StatusMovedPermanently)
 	}).Methods("GET")
 
-	// Swagger UI on /docs path
-	router.PathPrefix("/docs").Handler(httpSwagger.Handler(
-		httpSwagger.URL("/openapi.yaml"),
+	// Swagger UI on /api/docs path
+	router.PathPrefix("/api/docs").Handler(httpSwagger.Handler(
+		httpSwagger.URL("/api/openapi.yaml"),
 		httpSwagger.DeepLinking(true),
 		httpSwagger.DocExpansion("list"),
 		httpSwagger.DomID("swagger-ui"),
@@ -130,8 +130,8 @@ func main() {
 	port := ":8080"
 	fmt.Printf("Server starting on http://0.0.0.0%s\n", port)
 	fmt.Printf("Using Nitter instance: %s\n", nitterURL)
-	fmt.Printf("Swagger UI available at: http://localhost%s/docs/\n", port)
-	fmt.Printf("OpenAPI spec available at: http://localhost%s/openapi.yaml\n", port)
+	fmt.Printf("Swagger UI available at: http://localhost%s/api/docs/\n", port)
+	fmt.Printf("OpenAPI spec available at: http://localhost%s/api/openapi.yaml\n", port)
 	log.Fatal(http.ListenAndServe(port, router))
 }
 
