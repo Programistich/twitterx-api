@@ -3,7 +3,7 @@ services:
     image: python:3.11-slim
     container_name: nitter-session-init
     volumes:
-      - nitter-sessions:/sessions:Z
+      - ../nitter/sessions.jsonl:/src/sessions.jsonl:Z
       - ../nitter/generate_session.py:/src/generate_session.py:Z,ro
     environment:
       - TWITTER_USERNAME
@@ -13,7 +13,7 @@ services:
       sh -c "
         echo 'Generating Twitter session...' &&
         pip install -q pyotp requests cloudscraper &&
-        python /src/generate_session.py /sessions/sessions.jsonl &&
+        python /src/generate_session.py /src/sessions.jsonl &&
         echo 'Session generated successfully.'
       "
     networks:
@@ -47,8 +47,7 @@ services:
       - "127.0.0.1:8049:8049"
     volumes:
       - ../nitter/nitter.conf:/src/nitter.conf:Z,ro
-      - nitter-sessions:/sessions:Z,ro
-    command: ["/bin/sh", "-c", "ln -sf /sessions/sessions.jsonl /src/sessions.jsonl && /src/nitter"]
+      - ../nitter/sessions.jsonl:/src/sessions.jsonl:Z
     depends_on:
       session-generator:
         condition: service_completed_successfully
@@ -62,8 +61,6 @@ services:
       retries: 2
     user: "998:998"
     read_only: true
-    tmpfs:
-      - /src:size=10M,uid=998,gid=998
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -94,7 +91,6 @@ services:
 
 volumes:
   nitter-redis:
-  nitter-sessions:
 
 networks:
   twitter-net:

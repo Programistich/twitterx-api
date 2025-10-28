@@ -30,7 +30,6 @@ This directory contains all CI/CD, deployment, and configuration files for the T
 
 ### Docker Volumes
 - `nitter-redis` - Named volume for Redis persistent data
-- `nitter-sessions` - Named volume for shared Twitter session data between session-generator and nitter services
 
 ## Usage
 
@@ -67,10 +66,10 @@ NITTER_URL=http://127.0.0.1:8049
 The services start in this order:
 1. **nitter-redis** - Must be healthy before Nitter starts
 2. **session-generator** - Must complete successfully before Nitter starts
-   - Generates `sessions.jsonl` into named volume `nitter-sessions`
+   - Generates Twitter OAuth tokens and writes to `nitter/sessions.jsonl`
+   - Uses bind mount to share the file with host and nitter service
 3. **nitter** - Must be healthy before twitter-api starts
-   - Reads `sessions.jsonl` from named volume `nitter-sessions` via symbolic link
-   - Uses tmpfs for `/src` directory to allow symlink creation while maintaining read-only root filesystem
+   - Reads `sessions.jsonl` via bind mount from `nitter/sessions.jsonl`
 4. **twitter-api** - Starts last and depends on Nitter being ready
 
 ## Path References
