@@ -9,11 +9,14 @@ REST API for fetching tweets via Nitter and FxTwitter.
 cp scripts/.env.example .env
 # Fill .env with your credentials
 
-# 2. Run
+# 2. Create dump file
+touch nitter/sessions.jsonl
+
+# 3. Run
 cd scripts
 docker compose -f scripts/docker-compose.yml --env-file scripts/.env up -d
 
-# 3. API available at http://localhost:8080
+# 4. API available at http://localhost:8080
 ```
 
 ## API Documentation
