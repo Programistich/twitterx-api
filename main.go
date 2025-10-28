@@ -114,8 +114,13 @@ func main() {
 	// OpenAPI spec endpoint
 	router.HandleFunc("/openapi.yaml", serveOpenAPISpec).Methods("GET")
 
-	// Swagger UI (register PathPrefix last to avoid conflicts)
-	router.PathPrefix("/").Handler(httpSwagger.Handler(
+	// Root redirect to docs
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/docs/", http.StatusMovedPermanently)
+	}).Methods("GET")
+
+	// Swagger UI on /docs path
+	router.PathPrefix("/docs").Handler(httpSwagger.Handler(
 		httpSwagger.URL("/openapi.yaml"),
 		httpSwagger.DeepLinking(true),
 		httpSwagger.DocExpansion("list"),
@@ -125,7 +130,7 @@ func main() {
 	port := ":8080"
 	fmt.Printf("Server starting on http://0.0.0.0%s\n", port)
 	fmt.Printf("Using Nitter instance: %s\n", nitterURL)
-	fmt.Printf("Swagger UI available at: http://localhost%s/\n", port)
+	fmt.Printf("Swagger UI available at: http://localhost%s/docs/\n", port)
 	fmt.Printf("OpenAPI spec available at: http://localhost%s/openapi.yaml\n", port)
 	log.Fatal(http.ListenAndServe(port, router))
 }
