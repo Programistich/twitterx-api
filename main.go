@@ -128,7 +128,7 @@ func main() {
 	))
 
 	port := ":8080"
-	fmt.Printf("Server starting on http://0.0.0.0%s\n", port)
+	fmt.Printf("Server starting on http://localhost%s\n", port)
 	fmt.Printf("Using Nitter instance: %s\n", nitterURL)
 	fmt.Printf("Swagger UI available at: http://localhost%s/api/docs/\n", port)
 	fmt.Printf("OpenAPI spec available at: http://localhost%s/api/openapi.yaml\n", port)

@@ -92,9 +92,9 @@ After updating `openapi.yaml`:
 - [ ] Required vs optional fields are correctly marked
 - [ ] HTTP status codes are appropriate
 - [ ] Descriptions are clear and helpful
-- [ ] Run the application and verify Swagger UI at http://localhost:8080/
+- [ ] Run the application and verify Swagger UI at http://localhost:8080/api/docs/
 - [ ] Test the "Try it out" functionality in Swagger UI
-- [ ] Verify that `/openapi.yaml` endpoint returns the updated spec
+- [ ] Verify that `/api/openapi.yaml` endpoint returns the updated spec
 
 ### 5. Update Related Documentation
 
@@ -209,7 +209,7 @@ The Swagger UI is configured in `main.go` with these settings:
 
 ```go
 httpSwagger.Handler(
-    httpSwagger.URL("/openapi.yaml"),        // Points to spec file
+    httpSwagger.URL("/api/openapi.yaml"),    // Points to spec file
     httpSwagger.DeepLinking(true),           // Enable deep linking
     httpSwagger.DocExpansion("list"),        // Auto-expand endpoint list
     httpSwagger.DomID("swagger-ui"),         // DOM element ID

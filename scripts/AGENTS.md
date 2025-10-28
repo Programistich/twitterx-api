@@ -84,22 +84,44 @@ All paths in docker-compose.yml are relative to the scripts directory:
 - `..` - References the project root for build context
 - `scripts/Dockerfile` - References this directory's Dockerfile
 
+## Network Architecture
+
+The application uses two Docker networks:
+
+1. **twitter_shared_network** (internal)
+   - Used for inter-service communication
+   - Connects: twitter-api, nitter, nitter-redis, session-generator
+   - Not exposed to external traffic
+
+2. **caddynet** (external)
+   - Shared network for Caddy reverse proxy integration
+   - Connects: twitter-api to Caddy proxy
+   - Managed externally, must exist before starting services
+   - In production, Caddy handles all external traffic to the API
+
+**Production Access Pattern**:
+- External requests → Caddy (reverse proxy) → twitter-api container
+- Port 8080 is exposed within Docker network, not bound to host
+- Direct access to port 8080 only available in local development
+
 ## Security Notes
 
 - Nitter services run with minimal privileges (no-new-privileges, capability drops)
 - Redis and Nitter use read-only filesystems
 - Services run as non-root users (998:998, 999:1000)
 - Network isolation via shared Docker network
+- Production traffic routed through Caddy reverse proxy
 
 ## Port Mappings
 
-- `8080` - Twitter API (exposed publicly)
-  - `/` - Swagger UI interactive documentation
-  - `/openapi.yaml` - OpenAPI specification file
-  - `/users/{username}/tweets` - API endpoint
-  - `/users/{username}/tweets/{id}` - API endpoint
+- `8080` - Twitter API (exposed to Caddy, not bound to host)
+  - `/api/docs/` - Swagger UI interactive documentation
+  - `/api/openapi.yaml` - OpenAPI specification file
+  - `/api/users/{username}` - User profile endpoint
+  - `/api/users/{username}/tweets` - Tweet list endpoint
+  - `/api/users/{username}/tweets/{id}` - Specific tweet endpoint
 - `8049` - Nitter instance (bound to localhost only)
-- Redis runs on internal network only
+- Redis runs on internal `twitter_shared_network` only
 
 ## CI/CD and Deployment
 
@@ -117,7 +139,8 @@ The project uses GitHub Actions for continuous deployment to production servers:
 3. **Push**: Image is pushed to GitHub Container Registry (GHCR) at `ghcr.io/programistich/twitter-api:latest`
 4. **Deploy**: SSH connection to production server
 5. **Update**: Pull latest image and restart services
-6. **Cleanup**: Remove old unused Docker images
+6. **Caddy Reload**: Reload Caddy configuration to ensure reverse proxy is updated
+7. **Cleanup**: Remove old unused Docker images
 
 **Build optimization**:
 - Docker layer caching is enabled using GitHub Container Registry
@@ -162,8 +185,8 @@ docker pull ghcr.io/programistich/twitter-api:latest
 ## API Documentation
 
 The Twitter API includes built-in Swagger UI documentation:
-- **Swagger UI**: http://localhost:8080/ - Interactive API documentation
-- **OpenAPI Spec**: http://localhost:8080/openapi.yaml - Machine-readable specification
+- **Swagger UI**: http://localhost:8080/api/docs/ - Interactive API documentation
+- **OpenAPI Spec**: http://localhost:8080/api/openapi.yaml - Machine-readable specification
 
 When adding new endpoints or modifying existing ones:
 1. Update the OpenAPI specification in `docs/openapi/openapi.yaml`

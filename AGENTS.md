@@ -37,20 +37,34 @@ For deployment and CI/CD configuration, see `scripts/AGENTS.md`
 
 ## Architecture
 
+### System Layers
+
+**Production Architecture:**
+1. **Caddy Reverse Proxy** - Handles external HTTPS traffic and routes to twitter-api
+2. **Twitter API** - Go REST API service (this application)
+3. **Nitter** - Self-hosted RSS feed service
+4. **Redis** - Cache for Nitter instance
+
+**Network Isolation:**
+- External network (`caddynet`) - Connects Caddy to twitter-api
+- Internal network (`twitter_shared_network`) - Connects twitter-api, Nitter, and Redis
+
 ### Request Flow
 
 **User Profile Flow:**
-1. Client requests user profile via `/api/users/{username}`
-2. API queries FxTwitter API with the username
-3. User profile data is returned to client
+1. Client requests user profile via `/api/users/{username}` (through Caddy in production)
+2. Caddy forwards request to twitter-api container
+3. API queries FxTwitter API with the username
+4. User profile data is returned to client
 
 **Tweets Flow:**
-1. Client requests tweets from a user via `/api/users/{username}/tweets`
-2. API fetches the user's RSS feed from Nitter instance
-3. RSS parser extracts tweet IDs from the feed
-4. Client requests specific tweet details via `/api/users/{username}/tweets/{id}`
-5. API queries FxTwitter API with the tweet ID
-6. Tweet data is returned to client
+1. Client requests tweets from a user via `/api/users/{username}/tweets` (through Caddy in production)
+2. Caddy forwards request to twitter-api container
+3. API fetches the user's RSS feed from Nitter instance
+4. RSS parser extracts tweet IDs from the feed
+5. Client requests specific tweet details via `/api/users/{username}/tweets/{id}`
+6. API queries FxTwitter API with the tweet ID
+7. Tweet data is returned to client
 
 ### Module Structure
 - `go.mod` - Dependencies (includes github.com/swaggo/http-swagger for Swagger UI)
@@ -84,7 +98,13 @@ All Docker and deployment files are located in `scripts/` directory:
 - `scripts/docker-compose.yml` - Complete service orchestration
 - `scripts/.env.example` - Environment variables template
 
+**Production Setup:**
+- Requires external `caddynet` Docker network for Caddy integration
+- API exposed on port 8080 to Caddy (not bound to host)
+- Caddy reverse proxy handles all external traffic
+- Automatic deployment via GitHub Actions on push to `main` branch
+
 See `scripts/AGENTS.md` for detailed deployment instructions.
 
-## Nitter NitterService
+## Nitter Service
 Nitter Configuration in nitter/ folder

@@ -16,14 +16,19 @@ touch nitter/sessions.jsonl
 cd scripts
 docker compose -f scripts/docker-compose.yml --env-file scripts/.env up -d
 
+# Local run
+docker compose -f scripts/docker-compose.yml --env-file scripts/.env up -d --scale twitter-api=0
+set -a; source scripts/.env; set +a
+go run main.go
+
 # 4. API available at http://localhost:8080
 ```
 
 ## API Documentation
 
 **Interactive documentation powered by Swagger UI:**
-- 🌐 **Swagger UI**: http://localhost:8080/ - Interactive API explorer with "Try it out" functionality
-- 📄 **OpenAPI Spec**: http://localhost:8080/openapi.yaml - OpenAPI 3.0.3 specification file
+- 🌐 **Swagger UI**: http://localhost:8080/api/docs/ - Interactive API explorer with "Try it out" functionality
+- 📄 **OpenAPI Spec**: http://localhost:8080/api/openapi.yaml - OpenAPI 3.0.3 specification file
 
 The Swagger UI allows you to:
 - Browse all available endpoints and their parameters
@@ -33,8 +38,9 @@ The Swagger UI allows you to:
 
 ## Endpoints
 
-- `GET /users/{username}/tweets` - user's tweet list
-- `GET /users/{username}/tweets/{id}` - specific tweet details
+- `GET /api/users/{username}` - user profile
+- `GET /api/users/{username}/tweets` - user's tweet list
+- `GET /api/users/{username}/tweets/{id}` - specific tweet details
 
 ## Stack
 
@@ -42,6 +48,7 @@ The Swagger UI allows you to:
 - Nitter (RSS)
 - FxTwitter API
 - Docker
+- Caddy (reverse proxy in production)
 
 ## Documentation
 
