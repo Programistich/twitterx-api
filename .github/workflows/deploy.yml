@@ -64,13 +64,18 @@ jobs:
             set -e
             cd /root/twitter-api
 
+            # Pull latest changes from repository (configs, scripts)
             git pull origin main
 
-            # Pull latest images
+            # Pull latest image from GHCR
             docker compose -f scripts/docker-compose.yml -f scripts/docker-compose.prod.yml pull twitter-api
 
-            docker compose -f scripts/docker-compose.yml -f scripts/docker-compose.prod.yml build --no-cache
-            docker compose -f scripts/docker-compose.yml -f scripts/docker-compose.prod.yml up -d
+            # Restart services that may have changes:
+            # - twitter-api: new image from GHCR
+            # - nitter: nitter.conf or command may have changed
+            # - session-generator: generate_session.py may have changed
+            # Note: nitter-redis is NOT restarted to preserve cache
+            docker compose -f scripts/docker-compose.yml -f scripts/docker-compose.prod.yml up -d --force-recreate twitter-api nitter session-generator
 
-            # Clean up old images
-            docker image prune -f
+            # Clean up old images (remove unused images older than 48h)
+            docker image prune -af --filter "until=48h"

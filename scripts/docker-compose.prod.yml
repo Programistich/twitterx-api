@@ -2,7 +2,7 @@
 # This file replaces the build directive with a pre-built image from GitHub Container Registry
 #
 # Usage:
-#   docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 #
 # The image is automatically built and pushed by GitHub Actions on every push to main branch
 
