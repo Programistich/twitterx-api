@@ -17,6 +17,7 @@ cd scripts
 docker compose -f scripts/docker-compose.yml --env-file scripts/.env up -d
 
 # Local run
+docker network rm caddy && docker network create --driver bridge caddynet
 docker compose -f scripts/docker-compose.yml --env-file scripts/.env up -d --scale twitter-api=0
 set -a; source scripts/.env; set +a
 go run main.go
