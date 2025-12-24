@@ -1,16 +1,10 @@
 # FxTwitter API Documentation
 
-This is the main FixTweet API. It provides anyone access to the same exact data we use to generate FixTweet embeds for users, but in an easy-to-digest format for working with your existing scripts. It includes information based on Twitter APIs, including some data not accessible using Twitter's public API.
-
-Also, unlike Twitter, **you don't need an API key**, and it's free! At the moment, there are currently no *strict* rate limits, but please be nice! We reserve the right to block IP addresses and/or user agents that flood or abuse the API. We would *strongly prefer* if you be a good netizen and identify your application in its User Agent as well.
-
-## Note: These docs are new and will be improved over time
-
-All options appended with `?` are optional.
+This is the FixTweet API docs. This API allows you to fetch Twitter user profile information and Tweet (status) information in a simple JSON format.
 
 ---
 
-# User Fetch API
+# User Fetch API 
 
 ## `https://api.fxtwitter.com/:screen_name`
 

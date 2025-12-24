@@ -1,6 +1,6 @@
 **/.venv/
 .env
-nitter/sessions.jsonl
+infra/sessions.jsonl
 
 main
-twitter-api
+twitterx-api
