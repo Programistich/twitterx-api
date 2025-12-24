@@ -1,0 +1,9 @@
+services:
+  twitterx-api:
+    networks:
+      - twitter-net
+      - shared-proxy
+
+networks:
+  shared-proxy:
+    external: true

@@ -1,0 +1,64 @@
+services:
+  nitter-redis:
+    image: redis:6-alpine
+    container_name: nitter-redis
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - nitter-redis:/data
+    restart: unless-stopped
+    healthcheck:
+      test: redis-cli ping
+      interval: 30s
+      timeout: 5s
+      retries: 2
+    user: "999:1000"
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    networks:
+      - twitter-net
+
+  nitter:
+    image: ${NITTER_IMAGE}
+    container_name: nitter
+    volumes:
+      - ./nitter.conf:/src/nitter.conf:Z,ro
+      - ./sessions.jsonl:/src/sessions.jsonl:Z
+    env_file:
+      - .env
+    depends_on:
+      nitter-redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: wget -nv --tries=1 --spider http://127.0.0.1:8049/elonmusk || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 2
+    networks:
+      - twitter-net
+
+  twitterx-api:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+    container_name: twitterx-api
+    expose:
+      - "8080"
+    env_file:
+      - .env
+    depends_on:
+      nitter:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - twitter-net
+
+volumes:
+  nitter-redis:
+
+networks:
+  twitter-net:
+    name: twitter_shared_network

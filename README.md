@@ -1,59 +1,75 @@
-# Twitter API
+# TwitterX API
 
-REST API for fetching tweets via Nitter and FxTwitter.
+A Go REST API for fetching Twitter data without the official API.
+
+## About
+
+TwitterX API combines two services to fetch Twitter data:
+
+- **Nitter** — self-hosted RSS service for getting tweet IDs from user timelines
+- **FxTwitter API** — public API for fetching detailed tweet information
+
+### Why?
+
+The official Twitter API became paid and has strict limitations. This project provides a free alternative for:
+- Getting a user's tweet list
+- Fetching detailed tweet information (text, media, statistics)
+- Getting user profile information
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/users/{username}` | User profile information |
+| GET | `/api/users/{username}/tweets` | List of user's tweet IDs |
+| GET | `/api/users/{username}/tweets/{id}` | Detailed tweet information |
+| GET | `/api/docs/` | Swagger UI documentation |
 
 ## Quick Start
 
+### Requirements
+
+- Docker and Docker Compose
+
+### Running
+
 ```bash
-# 1. Setup
-cp scripts/.env.example .env
-# Fill .env with your credentials
-
-# 2. Create dump file
-touch nitter/sessions.jsonl
-
-# 3. Run
-cd scripts
-docker compose -f scripts/docker-compose.yml --env-file scripts/.env up -d
-
-# Local run
-docker network rm caddy && docker network create --driver bridge caddynet
-docker compose -f scripts/docker-compose.yml --env-file scripts/.env up -d --scale twitter-api=0
-set -a; source scripts/.env; set +a
-go run main.go
-
-# 4. API available at http://localhost:8080
+cd infra
+docker compose up -d
 ```
 
-## API Documentation
+Services will be available at:
+- API: `http://localhost:8080`
+- Swagger UI: `http://localhost:8080/api/docs/`
+- Nitter: `http://localhost:8049`
 
-**Interactive documentation powered by Swagger UI:**
-- 🌐 **Swagger UI**: http://localhost:8080/api/docs/ - Interactive API explorer with "Try it out" functionality
-- 📄 **OpenAPI Spec**: http://localhost:8080/api/openapi.yaml - OpenAPI 3.0.3 specification file
+### Configuration
 
-The Swagger UI allows you to:
-- Browse all available endpoints and their parameters
-- View request/response schemas and examples
-- Test API endpoints directly from your browser
-- Download the OpenAPI specification
+Environment variables in `infra/.env`:
 
-## Endpoints
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `NITTER_URL` | Nitter instance URL | `http://nitter:8049` |
+| `DEBUG` | Enable debug logs | `False` |
+| `NITTER_IMAGE` | Nitter Docker image | `zedeus/nitter:latest` |
 
-- `GET /api/users/{username}` - user profile
-- `GET /api/users/{username}/tweets` - user's tweet list
-- `GET /api/users/{username}/tweets/{id}` - specific tweet details
+## Development
 
-## Stack
+```bash
+# Install dependencies
+go mod download
 
-- Go 1.21
-- Nitter (RSS)
-- FxTwitter API
-- Docker
-- Caddy (reverse proxy in production)
+# Generate Swagger documentation
+go install github.com/swaggo/swag/cmd/swag@latest
+swag init -o docs/api
 
-## Documentation
+# Run (requires running Nitter instance)
+NITTER_URL=http://localhost:8049 go run main.go
+```
 
-- [AGENTS.md](AGENTS.md) - architecture and details
-- [docs/openapi/AGENTS.md](docs/openapi/AGENTS.md) - OpenAPI specification maintenance guide
-- [scripts/AGENTS.md](scripts/AGENTS.md) - deployment
-- [nitter/AGENTS.md](nitter/AGENTS.md) - nitter architecture and details
+## Production Deployment
+
+```bash
+cd infra
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+```

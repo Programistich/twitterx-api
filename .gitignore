@@ -1,6 +1,8 @@
 **/.venv/
 .env
-nitter/sessions.jsonl
+infra/sessions.jsonl
+infra/docker-compose.override.yml
 
 main
-twitter-api
+twitterx-api
+docs/api
