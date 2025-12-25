@@ -38,6 +38,9 @@ RUN apk --no-cache add ca-certificates
 # Copy binary from builder
 COPY --from=builder /build/twitter-api .
 
+# Copy OpenAPI documentation
+COPY --from=builder /build/docs/api ./docs/api
+
 # Expose port
 EXPOSE 8080
 

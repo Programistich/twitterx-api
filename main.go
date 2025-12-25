@@ -18,6 +18,8 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 	"twitterx-api/internal/logger"
 	"twitterx-api/internal/service"
+
+	_ "twitterx-api/docs/api" // Swagger generated docs
 )
 
 type TweetsResponse struct {

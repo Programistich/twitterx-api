@@ -1,6 +1,7 @@
 **/.venv/
 .env
 infra/sessions.jsonl
+infra/docker-compose.override.yml
 
 main
 twitterx-api
