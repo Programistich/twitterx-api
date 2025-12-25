@@ -23,7 +23,6 @@ The official Twitter API became paid and has strict limitations. This project pr
 | GET | `/api/users/{username}` | User profile information |
 | GET | `/api/users/{username}/tweets` | List of user's tweet IDs |
 | GET | `/api/users/{username}/tweets/{id}` | Detailed tweet information |
-| GET | `/api/docs/` | Swagger UI documentation |
 
 ## Quick Start
 
@@ -40,7 +39,6 @@ docker compose up -d
 
 Services will be available at:
 - API: `http://localhost:8080`
-- Swagger UI: `http://localhost:8080/api/docs/`
 - Nitter: `http://localhost:8049`
 
 ### Configuration
@@ -58,10 +56,6 @@ Environment variables in `infra/.env`:
 ```bash
 # Install dependencies
 go mod download
-
-# Generate Swagger documentation
-go install github.com/swaggo/swag/cmd/swag@latest
-swag init -o docs/api
 
 # Run (requires running Nitter instance)
 NITTER_URL=http://localhost:8049 go run main.go

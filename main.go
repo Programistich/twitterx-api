@@ -1,11 +1,3 @@
-//go:generate swag init -o docs/api
-
-// @title TwitterX API
-// @version 1.0
-// @description REST API for fetching Twitter user data via Nitter and FxTwitter
-// @BasePath /api
-// @schemes https http
-
 package main
 
 import (
@@ -15,11 +7,8 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
-	httpSwagger "github.com/swaggo/http-swagger"
 	"twitterx-api/internal/logger"
 	"twitterx-api/internal/service"
-
-	docs "twitterx-api/docs/api" // Swagger generated docs
 )
 
 type TweetsResponse struct {
@@ -27,16 +16,6 @@ type TweetsResponse struct {
 	TweetIDs []string `json:"tweet_ids"`
 }
 
-// GetUserTweets godoc
-// @Summary Get user tweet IDs
-// @Description Fetch tweet IDs for a Twitter user from Nitter RSS feed
-// @Tags tweets
-// @Accept json
-// @Produce json
-// @Param username path string true "Twitter username"
-// @Success 200 {object} TweetsResponse
-// @Failure 500 {string} string "Failed to fetch tweets"
-// @Router /users/{username}/tweets [get]
 func makeGetUserTweetsHandler(nitterService *service.NitterService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -68,17 +47,6 @@ func makeGetUserTweetsHandler(nitterService *service.NitterService) http.Handler
 	}
 }
 
-// GetTweet godoc
-// @Summary Get tweet details
-// @Description Fetch detailed tweet information from FxTwitter API
-// @Tags tweets
-// @Accept json
-// @Produce json
-// @Param username path string true "Twitter username"
-// @Param id path string true "Tweet ID"
-// @Success 200 {object} models.FxTwitterResponse
-// @Failure 500 {string} string "Failed to fetch tweet"
-// @Router /users/{username}/tweets/{id} [get]
 func makeGetTweetHandler(fxTwitterService *service.FxTwitterService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -106,16 +74,6 @@ func makeGetTweetHandler(fxTwitterService *service.FxTwitterService) http.Handle
 	}
 }
 
-// GetUser godoc
-// @Summary Get user profile
-// @Description Fetch Twitter user profile information from FxTwitter API
-// @Tags users
-// @Accept json
-// @Produce json
-// @Param username path string true "Twitter username"
-// @Success 200 {object} models.FxTwitterUserResponse
-// @Failure 500 {string} string "Failed to fetch user"
-// @Router /users/{username} [get]
 func makeGetUserHandler(fxTwitterService *service.FxTwitterService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -149,11 +107,6 @@ func main() {
 		logger.Fatal("NITTER_URL environment variable is required")
 	}
 
-	// Set Swagger host from environment (for production)
-	if swaggerHost := os.Getenv("SWAGGER_HOST"); swaggerHost != "" {
-		docs.SwaggerInfo.Host = swaggerHost
-	}
-
 	// Initialize Nitter service
 	nitterService := service.NewNitterService(nitterURL)
 
@@ -163,27 +116,14 @@ func main() {
 	// Setup router
 	router := mux.NewRouter()
 
-	// API endpoints (register specific routes first)
+	// API endpoints
 	router.HandleFunc("/api/users/{username}/tweets/{id}", makeGetTweetHandler(fxTwitterService)).Methods("GET")
 	router.HandleFunc("/api/users/{username}/tweets", makeGetUserTweetsHandler(nitterService)).Methods("GET")
 	router.HandleFunc("/api/users/{username}", makeGetUserHandler(fxTwitterService)).Methods("GET")
-
-	// Root redirect to docs
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/api/docs/", http.StatusMovedPermanently)
-	}).Methods("GET")
-
-	// Swagger UI on /api/docs path (uses generated docs from go:generate)
-	router.PathPrefix("/api/docs").Handler(httpSwagger.Handler(
-		httpSwagger.DeepLinking(true),
-		httpSwagger.DocExpansion("list"),
-		httpSwagger.DomID("swagger-ui"),
-	))
 
 	port := ":8080"
 	logger.Info("Server starting on http://localhost%s", port)
 	logger.Info("Using Nitter instance: %s", nitterURL)
 	logger.Info("Debug mode: %v", logger.IsDebugEnabled())
-	logger.Info("Swagger UI available at: http://localhost%s/api/docs/", port)
 	logger.Fatal(http.ListenAndServe(port, router).Error())
 }
