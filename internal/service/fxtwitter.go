@@ -2,11 +2,11 @@ package service
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"time"
 
+	"twitterx-api/internal/apperror"
 	"twitterx-api/internal/logger"
 	"twitterx-api/internal/models"
 )
@@ -30,22 +30,22 @@ func NewFxTwitterService() *FxTwitterService {
 // GetTweetData fetches complete tweet data from FxTwitter API
 func (s *FxTwitterService) GetTweetData(username, tweetID string) (*models.FxTwitterResponse, error) {
 	if username == "" {
-		return nil, fmt.Errorf("username cannot be empty")
+		return nil, &apperror.ValidationError{Field: "username", Message: "cannot be empty"}
 	}
 	if tweetID == "" {
-		return nil, fmt.Errorf("tweet ID cannot be empty")
+		return nil, &apperror.ValidationError{Field: "tweetID", Message: "cannot be empty"}
 	}
 
 	// Construct API URL
 	// Format: https://api.fxtwitter.com/{username}/status/{id}
-	apiURL := fmt.Sprintf("%s/%s/status/%s", fxTwitterAPIBaseURL, username, tweetID)
+	apiURL := fxTwitterAPIBaseURL + "/" + username + "/status/" + tweetID
 	logger.Debug("FxTwitter: fetching tweet from %s", apiURL)
 
 	// Make HTTP request
 	resp, err := s.httpClient.Get(apiURL)
 	if err != nil {
 		logger.Error("FxTwitter: failed to fetch tweet data: %v", err)
-		return nil, fmt.Errorf("failed to fetch tweet data: %w", err)
+		return nil, &apperror.UpstreamError{Service: "FxTwitter", Message: "failed to fetch tweet data", Err: err}
 	}
 	defer resp.Body.Close()
 
@@ -55,7 +55,7 @@ func (s *FxTwitterService) GetTweetData(username, tweetID string) (*models.FxTwi
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		logger.Error("FxTwitter: failed to read response body: %v", err)
-		return nil, fmt.Errorf("failed to read response body: %w", err)
+		return nil, &apperror.UpstreamError{Service: "FxTwitter", Message: "failed to read response body", Err: err}
 	}
 
 	logger.Debug("FxTwitter: received %d bytes", len(body))
@@ -64,13 +64,16 @@ func (s *FxTwitterService) GetTweetData(username, tweetID string) (*models.FxTwi
 	var fxResponse models.FxTwitterResponse
 	if err := json.Unmarshal(body, &fxResponse); err != nil {
 		logger.Error("FxTwitter: failed to parse JSON response: %v", err)
-		return nil, fmt.Errorf("failed to parse JSON response: %w", err)
+		return nil, &apperror.UpstreamError{Service: "FxTwitter", Message: "failed to parse JSON response", Err: err}
 	}
 
-	// Check for API errors
+	// Check for API errors (404 = NOT_FOUND, 401 = PRIVATE_TWEET, 500 = API_FAIL)
+	if fxResponse.Code == 404 {
+		return nil, &apperror.NotFoundError{Resource: "tweet", ID: tweetID}
+	}
 	if fxResponse.Code != 200 {
 		logger.Error("FxTwitter: API error: %s (code: %d)", fxResponse.Message, fxResponse.Code)
-		return nil, fmt.Errorf("FxTwitter API error: %s (code: %d)", fxResponse.Message, fxResponse.Code)
+		return nil, &apperror.UpstreamError{Service: "FxTwitter", StatusCode: fxResponse.Code, Message: fxResponse.Message}
 	}
 
 	logger.Debug("FxTwitter: successfully fetched tweet %s", tweetID)
@@ -80,19 +83,19 @@ func (s *FxTwitterService) GetTweetData(username, tweetID string) (*models.FxTwi
 // GetUserData fetches user profile data from FxTwitter API
 func (s *FxTwitterService) GetUserData(username string) (*models.FxTwitterUserResponse, error) {
 	if username == "" {
-		return nil, fmt.Errorf("username cannot be empty")
+		return nil, &apperror.ValidationError{Field: "username", Message: "cannot be empty"}
 	}
 
 	// Construct API URL
 	// Format: https://api.fxtwitter.com/{username}
-	apiURL := fmt.Sprintf("%s/%s", fxTwitterAPIBaseURL, username)
+	apiURL := fxTwitterAPIBaseURL + "/" + username
 	logger.Debug("FxTwitter: fetching user from %s", apiURL)
 
 	// Make HTTP request
 	resp, err := s.httpClient.Get(apiURL)
 	if err != nil {
 		logger.Error("FxTwitter: failed to fetch user data: %v", err)
-		return nil, fmt.Errorf("failed to fetch user data: %w", err)
+		return nil, &apperror.UpstreamError{Service: "FxTwitter", Message: "failed to fetch user data", Err: err}
 	}
 	defer resp.Body.Close()
 
@@ -102,7 +105,7 @@ func (s *FxTwitterService) GetUserData(username string) (*models.FxTwitterUserRe
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		logger.Error("FxTwitter: failed to read response body: %v", err)
-		return nil, fmt.Errorf("failed to read response body: %w", err)
+		return nil, &apperror.UpstreamError{Service: "FxTwitter", Message: "failed to read response body", Err: err}
 	}
 
 	logger.Debug("FxTwitter: received %d bytes", len(body))
@@ -111,13 +114,16 @@ func (s *FxTwitterService) GetUserData(username string) (*models.FxTwitterUserRe
 	var fxUserResponse models.FxTwitterUserResponse
 	if err := json.Unmarshal(body, &fxUserResponse); err != nil {
 		logger.Error("FxTwitter: failed to parse JSON response: %v", err)
-		return nil, fmt.Errorf("failed to parse JSON response: %w", err)
+		return nil, &apperror.UpstreamError{Service: "FxTwitter", Message: "failed to parse JSON response", Err: err}
 	}
 
-	// Check for API errors
+	// Check for API errors (404 = NOT_FOUND, 500 = API_FAIL)
+	if fxUserResponse.Code == 404 {
+		return nil, &apperror.NotFoundError{Resource: "user", ID: username}
+	}
 	if fxUserResponse.Code != 200 {
 		logger.Error("FxTwitter: API error: %s (code: %d)", fxUserResponse.Message, fxUserResponse.Code)
-		return nil, fmt.Errorf("FxTwitter API error: %s (code: %d)", fxUserResponse.Message, fxUserResponse.Code)
+		return nil, &apperror.UpstreamError{Service: "FxTwitter", StatusCode: fxUserResponse.Code, Message: fxUserResponse.Message}
 	}
 
 	logger.Debug("FxTwitter: successfully fetched user %s", username)

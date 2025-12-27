@@ -2,11 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"os"
 
 	"github.com/gorilla/mux"
+	"twitterx-api/internal/apperror"
 	"twitterx-api/internal/logger"
 	"twitterx-api/internal/service"
 )
@@ -27,7 +27,7 @@ func makeGetUserTweetsHandler(nitterService *service.NitterService) http.Handler
 		tweetIDs, err := nitterService.GetUserTweetIDs(username)
 		if err != nil {
 			logger.Error("Error fetching tweets for user %s: %v", username, err)
-			http.Error(w, fmt.Sprintf("Failed to fetch tweets: %v", err), http.StatusInternalServerError)
+			http.Error(w, err.Error(), apperror.HTTPStatusCode(err))
 			return
 		}
 
@@ -59,7 +59,7 @@ func makeGetTweetHandler(fxTwitterService *service.FxTwitterService) http.Handle
 		tweetData, err := fxTwitterService.GetTweetData(username, tweetID)
 		if err != nil {
 			logger.Error("Error fetching tweet %s for user %s: %v", tweetID, username, err)
-			http.Error(w, fmt.Sprintf("Failed to fetch tweet: %v", err), http.StatusInternalServerError)
+			http.Error(w, err.Error(), apperror.HTTPStatusCode(err))
 			return
 		}
 
@@ -85,7 +85,7 @@ func makeGetUserHandler(fxTwitterService *service.FxTwitterService) http.Handler
 		userData, err := fxTwitterService.GetUserData(username)
 		if err != nil {
 			logger.Error("Error fetching user %s: %v", username, err)
-			http.Error(w, fmt.Sprintf("Failed to fetch user: %v", err), http.StatusInternalServerError)
+			http.Error(w, err.Error(), apperror.HTTPStatusCode(err))
 			return
 		}
 

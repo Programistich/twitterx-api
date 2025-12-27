@@ -21,9 +21,6 @@ RUN go mod download
 # Copy source code
 COPY . .
 
-# Generate OpenAPI documentation
-RUN swag init -o docs/api
-
 # Build the application
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o twitter-api .
 
