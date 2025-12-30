@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading... - TwitterX</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            background-color: #000;
+        }
+        .avatar {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+        }
+        .banner {
+            height: 150px;
+            object-fit: cover;
+        }
+        .verified-icon {
+            width: 18px;
+            height: 18px;
+            fill: #1d9bf0;
+        }
+        .verified-icon.gold {
+            fill: #ffd400;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+
+                <!-- Header -->
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <a href="/" class="text-white text-decoration-none">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z"/>
+                        </svg>
+                    </a>
+                    <div>
+                        <h5 class="mb-0 fw-bold" id="headerName">Loading...</h5>
+                        <small class="text-secondary" id="headerTweets"></small>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div class="text-center py-5" id="loadingState">
+                    <div class="spinner-border text-primary mb-3"></div>
+                    <p class="text-secondary mb-0">Loading profile...</p>
+                </div>
+
+                <!-- Error State -->
+                <div class="text-center py-5 d-none" id="errorState">
+                    <div class="text-danger mb-3">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                        </svg>
+                    </div>
+                    <h5 class="fw-bold">User not found</h5>
+                    <p class="text-secondary" id="errorText">This account doesn't exist.</p>
+                    <a href="/" class="btn btn-primary">Back to Search</a>
+                </div>
+
+                <!-- Profile Content -->
+                <div class="d-none" id="profileContent">
+
+                    <!-- Banner -->
+                    <div class="bg-secondary rounded-3 mb-3 overflow-hidden" id="bannerWrapper" style="height: 150px;">
+                        <img src="" alt="Banner" class="w-100 banner d-none" id="banner">
+                    </div>
+
+                    <!-- Avatar + View on X -->
+                    <div class="d-flex justify-content-between align-items-end mb-3" style="margin-top: -50px;">
+                        <img src="" alt="Avatar" class="avatar rounded-circle border border-4 border-dark bg-secondary" id="avatar">
+                        <a href="" target="_blank" class="btn btn-outline-secondary btn-sm" id="twitterLink">View on X</a>
+                    </div>
+
+                    <!-- Name -->
+                    <div class="d-flex align-items-center gap-1 mb-1">
+                        <h4 class="mb-0 fw-bold" id="displayName"></h4>
+                        <span class="d-none" id="verificationBadge">
+                            <svg viewBox="0 0 22 22" class="verified-icon">
+                                <path d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"/>
+                            </svg>
+                        </span>
+                        <span class="badge bg-secondary d-none" id="protectedBadge">Protected</span>
+                    </div>
+
+                    <!-- Username -->
+                    <p class="text-secondary mb-3" id="username"></p>
+
+                    <!-- Bio -->
+                    <p class="mb-3" id="bio"></p>
+
+                    <!-- Meta info -->
+                    <div class="d-flex flex-wrap gap-3 text-secondary small mb-3">
+                        <span class="d-none" id="locationWrapper">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="me-1">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                            </svg>
+                            <span id="location"></span>
+                        </span>
+                        <span class="d-none" id="websiteWrapper">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="me-1">
+                                <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+                            </svg>
+                            <a href="" target="_blank" id="website" class="text-decoration-none"></a>
+                        </span>
+                        <span class="d-none" id="joinedWrapper">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="me-1">
+                                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/>
+                            </svg>
+                            <span id="joined"></span>
+                        </span>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="d-flex gap-4 mb-4">
+                        <span>
+                            <span class="fw-bold" id="following">0</span>
+                            <span class="text-secondary">Following</span>
+                        </span>
+                        <span>
+                            <span class="fw-bold" id="followers">0</span>
+                            <span class="text-secondary">Followers</span>
+                        </span>
+                    </div>
+
+                    <!-- Extra stats -->
+                    <div class="d-flex gap-4 pt-3 border-top small text-secondary">
+                        <span><span class="fw-bold text-white" id="tweets">0</span> posts</span>
+                        <span><span class="fw-bold text-white" id="likes">0</span> likes</span>
+                        <span><span class="fw-bold text-white" id="media">0</span> media</span>
+                    </div>
+
+                    <!-- Tweets Section -->
+                    <div class="mt-4 pt-3 border-top">
+                        <h5 class="fw-bold mb-3">Recent Posts</h5>
+
+                        <!-- Tweets Loading -->
+                        <div class="text-center py-4" id="tweetsLoading">
+                            <div class="spinner-border spinner-border-sm text-primary"></div>
+                            <span class="text-secondary ms-2">Loading posts...</span>
+                        </div>
+
+                        <!-- Tweets Error -->
+                        <div class="text-center py-4 d-none" id="tweetsError">
+                            <p class="text-secondary mb-0" id="tweetsErrorText">Failed to load posts</p>
+                        </div>
+
+                        <!-- Tweets List -->
+                        <div class="d-none" id="tweetsList"></div>
+                    </div>
+
+                </div>
+
+                <!-- Footer -->
+                <footer class="text-center mt-5">
+                    <small class="text-secondary">
+                        Powered by <a href="https://github.com/FixTweet/FxTwitter" target="_blank" class="text-decoration-none">FxTwitter</a>
+                    </small>
+                </footer>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/profile.js"></script>
+</body>
+</html>

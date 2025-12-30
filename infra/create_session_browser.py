@@ -141,7 +141,7 @@ async def main():
         }
         output = json.dumps(session)
 
-        with open("session.jsonl", 'a') as f:
+        with open("sessions.jsonl", 'a') as f:
             f.write(output + '\n')
         print(f'✓ Session appended to {append_file}', file=sys.stderr)
 

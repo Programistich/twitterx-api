@@ -41,20 +41,26 @@ func ParseRSS(data []byte) (*RSS, error) {
 }
 
 // ExtractTweetIDs extracts tweet IDs from RSS items
-// GUID format: http://127.0.0.1:8049/elonmusk/status/1982148508187500913#m
+// GUID can be either a plain ID (e.g., "2006027578998472912") or a URL with /status/ path
 func ExtractTweetIDs(rss *RSS) ([]string, error) {
 	if rss == nil {
 		return nil, fmt.Errorf("rss is nil")
 	}
 
-	var tweetIDs []string
+	tweetIDs := []string{}
 	// Regex to extract tweet ID from GUID
-	// Pattern: /status/(\d+)
-	re := regexp.MustCompile(`/status/(\d+)`)
+	// Supports both formats:
+	// - Plain numeric ID: "2006027578998472912"
+	// - URL format: "/status/1982148508187500913#m"
+	statusRe := regexp.MustCompile(`/status/(\d+)`)
+	plainRe := regexp.MustCompile(`^(\d+)$`)
 
 	for _, item := range rss.Channel.Items {
-		matches := re.FindStringSubmatch(item.GUID)
-		if len(matches) >= 2 {
+		// Try URL format first
+		if matches := statusRe.FindStringSubmatch(item.GUID); len(matches) >= 2 {
+			tweetIDs = append(tweetIDs, matches[1])
+		} else if matches := plainRe.FindStringSubmatch(item.GUID); len(matches) >= 2 {
+			// Fall back to plain numeric ID
 			tweetIDs = append(tweetIDs, matches[1])
 		}
 	}

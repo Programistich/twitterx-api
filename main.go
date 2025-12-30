@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/gorilla/mux"
 	"twitterx-api/internal/apperror"
@@ -100,6 +101,14 @@ func makeGetUserHandler(fxTwitterService *service.FxTwitterService) http.Handler
 	}
 }
 
+func serveIndex(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, filepath.Join("public", "index.html"))
+}
+
+func serveProfile(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, filepath.Join("public", "profile.html"))
+}
+
 func main() {
 	// Get Nitter URL from environment
 	nitterURL := os.Getenv("NITTER_URL")
@@ -121,9 +130,19 @@ func main() {
 	router.HandleFunc("/api/users/{username}/tweets", makeGetUserTweetsHandler(nitterService)).Methods("GET")
 	router.HandleFunc("/api/users/{username}", makeGetUserHandler(fxTwitterService)).Methods("GET")
 
+	// Static files
+	staticFileServer := http.FileServer(http.Dir(filepath.Join("public", "static")))
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", staticFileServer))
+
+	// UI routes
+	router.HandleFunc("/", serveIndex).Methods("GET")
+	router.HandleFunc("/{username}", serveProfile).Methods("GET")
+
 	port := ":8080"
-	logger.Info("Server starting on http://localhost%s", port)
+	logger.Info("Server starting on http://127.0.0.1%s", port)
 	logger.Info("Using Nitter instance: %s", nitterURL)
 	logger.Info("Debug mode: %v", logger.IsDebugEnabled())
-	logger.Fatal(http.ListenAndServe(port, router).Error())
+	if err := http.ListenAndServe(port, router); err != nil {
+		logger.Fatal("Server error: %v", err)
+	}
 }

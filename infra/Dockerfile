@@ -6,9 +6,6 @@ WORKDIR /build
 # Install build dependencies
 RUN apk add --no-cache git
 
-# Install swag for OpenAPI docs generation
-RUN go install github.com/swaggo/swag/cmd/swag@latest
-
 # Copy go mod files
 COPY go.mod ./
 
@@ -35,8 +32,8 @@ RUN apk --no-cache add ca-certificates
 # Copy binary from builder
 COPY --from=builder /build/twitter-api .
 
-# Copy OpenAPI documentation
-COPY --from=builder /build/docs/api ./docs/api
+# Copy static files
+COPY --from=builder /build/public ./public
 
 # Expose port
 EXPOSE 8080
