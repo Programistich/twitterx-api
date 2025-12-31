@@ -1,3 +1,5 @@
+name: twitterx-api
+
 services:
   nitter-redis:
     image: redis:6-alpine
