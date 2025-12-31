@@ -58,7 +58,10 @@ Environment variables in `infra/.env`:
 go mod download
 
 # Run (requires running Nitter instance)
-NITTER_URL=http://localhost:8049 go run main.go
+NITTER_URL=http://localhost:8049 go run ./cmd/api
+
+# Run all tests
+go test ./...
 ```
 
 ## Production Deployment
