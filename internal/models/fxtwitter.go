@@ -38,71 +38,71 @@ func (tt TwitterTime) MarshalJSON() ([]byte, error) {
 
 // FxTwitterResponse represents the complete response from FxTwitter API
 type FxTwitterResponse struct {
-	Code    int     `json:"code"`
-	Message string  `json:"message"`
-	Tweet   *Tweet  `json:"tweet,omitempty"`
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Tweet   *Tweet `json:"tweet,omitempty"`
 }
 
 // Tweet represents a single tweet with all its data
 type Tweet struct {
-	URL               string         `json:"url"`
-	ID                string         `json:"id"`
-	Text              string         `json:"text"`
-	Author            Author         `json:"author"`
-	Replies           int64          `json:"replies"`
-	Retweets          int64          `json:"retweets"`
-	Likes             int64          `json:"likes"`
-	Views             *int64         `json:"views,omitempty"`
-	CreatedAt         TwitterTime    `json:"created_at"`
-	CreatedTimestamp  int64          `json:"created_timestamp"`
-	PossiblyScam      bool           `json:"possibly_scam"`
-	PossiblySensitive bool           `json:"possibly_sensitive"`
-	Lang              string         `json:"lang"`
-	Source            string         `json:"source"`
-	Media             *Media         `json:"media,omitempty"`
-	Poll              *Poll          `json:"poll,omitempty"`
-	Quote             *Tweet         `json:"quote,omitempty"`
-	Translation       *Translation   `json:"translation,omitempty"`
+	URL               string       `json:"url"`
+	ID                string       `json:"id"`
+	Text              string       `json:"text"`
+	Author            Author       `json:"author"`
+	Replies           int64        `json:"replies"`
+	Retweets          int64        `json:"retweets"`
+	Likes             int64        `json:"likes"`
+	Views             *int64       `json:"views,omitempty"`
+	CreatedAt         TwitterTime  `json:"created_at"`
+	CreatedTimestamp  int64        `json:"created_timestamp"`
+	PossiblyScam      bool         `json:"possibly_scam"`
+	PossiblySensitive bool         `json:"possibly_sensitive"`
+	Lang              string       `json:"lang"`
+	Source            string       `json:"source"`
+	Media             *Media       `json:"media,omitempty"`
+	Poll              *Poll        `json:"poll,omitempty"`
+	Quote             *Tweet       `json:"quote,omitempty"`
+	Translation       *Translation `json:"translation,omitempty"`
 }
 
 // Author represents the tweet author information
 type Author struct {
-	ID              string  `json:"id"`
-	Name            string  `json:"name"`
-	ScreenName      string  `json:"screen_name"`
-	AvatarURL       string  `json:"avatar_url"`
-	AvatarColor     *string `json:"avatar_color,omitempty"`
-	BannerURL       *string `json:"banner_url,omitempty"`
-	Description     *string `json:"description,omitempty"`
-	Location        *string `json:"location,omitempty"`
-	URL             *string `json:"url,omitempty"`
-	Followers       *int64  `json:"followers,omitempty"`
-	Following       *int64  `json:"following,omitempty"`
-	Joined          *string `json:"joined,omitempty"`
-	Likes           *int64  `json:"likes,omitempty"`
-	Tweets          *int64  `json:"tweets,omitempty"`
-	Verified        bool    `json:"verified"`
-	BlueBadge       bool    `json:"blue_badge"`
+	ID          string  `json:"id"`
+	Name        string  `json:"name"`
+	ScreenName  string  `json:"screen_name"`
+	AvatarURL   string  `json:"avatar_url"`
+	AvatarColor *string `json:"avatar_color,omitempty"`
+	BannerURL   *string `json:"banner_url,omitempty"`
+	Description *string `json:"description,omitempty"`
+	Location    *string `json:"location,omitempty"`
+	URL         *string `json:"url,omitempty"`
+	Followers   *int64  `json:"followers,omitempty"`
+	Following   *int64  `json:"following,omitempty"`
+	Joined      *string `json:"joined,omitempty"`
+	Likes       *int64  `json:"likes,omitempty"`
+	Tweets      *int64  `json:"tweets,omitempty"`
+	Verified    bool    `json:"verified"`
+	BlueBadge   bool    `json:"blue_badge"`
 }
 
 // Media represents media attachments in a tweet
 type Media struct {
-	All     []MediaItem  `json:"all,omitempty"`
-	Photos  []Photo      `json:"photos,omitempty"`
-	Videos  []Video      `json:"videos,omitempty"`
-	Mosaic  *MosaicInfo  `json:"mosaic,omitempty"`
+	All      []MediaItem    `json:"all,omitempty"`
+	Photos   []Photo        `json:"photos,omitempty"`
+	Videos   []Video        `json:"videos,omitempty"`
+	Mosaic   *MosaicInfo    `json:"mosaic,omitempty"`
 	External *ExternalMedia `json:"external,omitempty"`
 }
 
 // MediaItem represents a generic media item
 type MediaItem struct {
-	Type         string `json:"type"`
-	URL          string `json:"url"`
-	Width        int    `json:"width"`
-	Height       int    `json:"height"`
-	Format       string `json:"format,omitempty"`
-	ThumbnailURL string `json:"thumbnail_url,omitempty"`
-	Duration     *int   `json:"duration,omitempty"`
+	Type         string   `json:"type"`
+	URL          string   `json:"url"`
+	Width        int      `json:"width"`
+	Height       int      `json:"height"`
+	Format       string   `json:"format,omitempty"`
+	ThumbnailURL string   `json:"thumbnail_url,omitempty"`
+	Duration     *float64 `json:"duration,omitempty"`
 }
 
 // Photo represents a photo attachment
@@ -115,29 +115,29 @@ type Photo struct {
 
 // Video represents a video attachment
 type Video struct {
-	URL          string `json:"url"`
-	ThumbnailURL string `json:"thumbnail_url"`
-	Width        int    `json:"width"`
-	Height       int    `json:"height"`
-	Format       string `json:"format,omitempty"`
-	Duration     int    `json:"duration,omitempty"`
-	Type         string `json:"type,omitempty"`
+	URL          string   `json:"url"`
+	ThumbnailURL string   `json:"thumbnail_url"`
+	Width        int      `json:"width"`
+	Height       int      `json:"height"`
+	Format       string   `json:"format,omitempty"`
+	Duration     *float64 `json:"duration,omitempty"`
+	Type         string   `json:"type,omitempty"`
 }
 
 // MosaicInfo represents mosaic layout information for multiple photos
 type MosaicInfo struct {
-	Type   string       `json:"type"`
-	Formats []string     `json:"formats,omitempty"`
+	Type    string   `json:"type"`
+	Formats []string `json:"formats,omitempty"`
 }
 
 // ExternalMedia represents external media embeds (e.g., YouTube)
 type ExternalMedia struct {
-	Type         string `json:"type"`
-	URL          string `json:"url"`
-	ThumbnailURL string `json:"thumbnail_url,omitempty"`
-	Width        int    `json:"width,omitempty"`
-	Height       int    `json:"height,omitempty"`
-	Duration     *int   `json:"duration,omitempty"`
+	Type         string   `json:"type"`
+	URL          string   `json:"url"`
+	ThumbnailURL string   `json:"thumbnail_url,omitempty"`
+	Width        int      `json:"width,omitempty"`
+	Height       int      `json:"height,omitempty"`
+	Duration     *float64 `json:"duration,omitempty"`
 }
 
 // Poll represents a poll in a tweet
