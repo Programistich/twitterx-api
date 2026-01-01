@@ -126,8 +126,10 @@ type Video struct {
 
 // MosaicInfo represents mosaic layout information for multiple photos
 type MosaicInfo struct {
-	Type    string   `json:"type"`
-	Formats []string `json:"formats,omitempty"`
+	Type    string            `json:"type"`
+	Width   *int              `json:"width,omitempty"`
+	Height  *int              `json:"height,omitempty"`
+	Formats map[string]string `json:"formats,omitempty"`
 }
 
 // ExternalMedia represents external media embeds (e.g., YouTube)

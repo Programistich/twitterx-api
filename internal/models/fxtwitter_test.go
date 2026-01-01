@@ -42,3 +42,58 @@ func TestTwitterTimeMarshalJSON(t *testing.T) {
 		t.Fatalf("unexpected JSON: %s", string(b))
 	}
 }
+
+func TestFxTwitterMosaicFormatsUnmarshal(t *testing.T) {
+	input := []byte(`{
+		"code": 200,
+		"message": "OK",
+		"tweet": {
+			"id": "1",
+			"url": "https://x.com/example/status/1",
+			"text": "hello",
+			"author": {
+				"id": "1",
+				"name": "Example",
+				"screen_name": "example",
+				"avatar_url": "https://example.com/avatar.jpg",
+				"verified": false,
+				"blue_badge": false
+			},
+			"replies": 0,
+			"retweets": 0,
+			"likes": 0,
+			"created_at": "Mon Jan 02 15:04:05 -0700 2006",
+			"created_timestamp": 1,
+			"possibly_scam": false,
+			"possibly_sensitive": false,
+			"lang": "en",
+			"source": "web",
+			"media": {
+				"mosaic": {
+					"type": "mosaic_photo",
+					"formats": {
+						"jpeg": "https://mosaic.example/jpeg",
+						"webp": "https://mosaic.example/webp"
+					}
+				}
+			}
+		}
+	}`)
+
+	var resp FxTwitterResponse
+	if err := json.Unmarshal(input, &resp); err != nil {
+		t.Fatalf("unmarshal error: %v", err)
+	}
+
+	if resp.Tweet == nil || resp.Tweet.Media == nil || resp.Tweet.Media.Mosaic == nil {
+		t.Fatalf("missing mosaic data after unmarshal")
+	}
+
+	formats := resp.Tweet.Media.Mosaic.Formats
+	if formats["jpeg"] != "https://mosaic.example/jpeg" {
+		t.Fatalf("unexpected jpeg format: %s", formats["jpeg"])
+	}
+	if formats["webp"] != "https://mosaic.example/webp" {
+		t.Fatalf("unexpected webp format: %s", formats["webp"])
+	}
+}
