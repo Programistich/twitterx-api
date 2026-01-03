@@ -83,6 +83,31 @@ func TestFxTwitterServiceGetTweetDataSuccess(t *testing.T) {
 	}
 }
 
+func TestFxTwitterServiceGetTweetDataWithReply(t *testing.T) {
+	svc := &FxTwitterService{httpClient: &http.Client{Transport: roundTripFunc(func(r *http.Request) (*http.Response, error) {
+		body := `{"code":200,"message":"OK","tweet":{"id":"123","text":"hi","author":{"id":"1","name":"A","screen_name":"a","avatar_url":"x","verified":false,"blue_badge":false},"created_at":"Mon Jan 02 15:04:05 -0700 2006","created_timestamp":1,"replies":0,"retweets":0,"likes":0,"possibly_scam":false,"possibly_sensitive":false,"lang":"en","source":"web","replying_to":"otheruser","replying_to_status":"999"}}`
+		return &http.Response{
+			StatusCode: http.StatusOK,
+			Body:       io.NopCloser(bytes.NewBufferString(body)),
+			Header:     make(http.Header),
+		}, nil
+	})}}
+
+	resp, err := svc.GetTweetData("user", "123")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resp.Tweet == nil || resp.Tweet.ID != "123" {
+		t.Fatalf("unexpected tweet response: %#v", resp.Tweet)
+	}
+	if resp.Tweet.ReplyingTo == nil || *resp.Tweet.ReplyingTo != "otheruser" {
+		t.Fatalf("unexpected replying_to: %v", resp.Tweet.ReplyingTo)
+	}
+	if resp.Tweet.ReplyingToStatus == nil || *resp.Tweet.ReplyingToStatus != "999" {
+		t.Fatalf("unexpected replying_to_status: %v", resp.Tweet.ReplyingToStatus)
+	}
+}
+
 func TestFxTwitterServiceGetUserDataValidation(t *testing.T) {
 	svc := &FxTwitterService{}
 	_, err := svc.GetUserData("")

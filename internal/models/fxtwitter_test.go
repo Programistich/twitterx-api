@@ -43,6 +43,103 @@ func TestTwitterTimeMarshalJSON(t *testing.T) {
 	}
 }
 
+func TestTweetReplyingToFieldsUnmarshal(t *testing.T) {
+	replyingTo := "someuser"
+	replyingToStatus := "123456789"
+
+	input := []byte(`{
+		"code": 200,
+		"message": "OK",
+		"tweet": {
+			"id": "1",
+			"url": "https://x.com/example/status/1",
+			"text": "hello",
+			"author": {
+				"id": "1",
+				"name": "Example",
+				"screen_name": "example",
+				"avatar_url": "https://example.com/avatar.jpg",
+				"verified": false,
+				"blue_badge": false
+			},
+			"replies": 0,
+			"retweets": 0,
+			"likes": 0,
+			"created_at": "Mon Jan 02 15:04:05 -0700 2006",
+			"created_timestamp": 1,
+			"possibly_scam": false,
+			"possibly_sensitive": false,
+			"lang": "en",
+			"source": "web",
+			"replying_to": "someuser",
+			"replying_to_status": "123456789"
+		}
+	}`)
+
+	var resp FxTwitterResponse
+	if err := json.Unmarshal(input, &resp); err != nil {
+		t.Fatalf("unmarshal error: %v", err)
+	}
+
+	if resp.Tweet == nil {
+		t.Fatalf("missing tweet data after unmarshal")
+	}
+
+	if resp.Tweet.ReplyingTo == nil || *resp.Tweet.ReplyingTo != replyingTo {
+		t.Fatalf("unexpected replying_to: got %v, want %s", resp.Tweet.ReplyingTo, replyingTo)
+	}
+	if resp.Tweet.ReplyingToStatus == nil || *resp.Tweet.ReplyingToStatus != replyingToStatus {
+		t.Fatalf("unexpected replying_to_status: got %v, want %s", resp.Tweet.ReplyingToStatus, replyingToStatus)
+	}
+}
+
+func TestTweetReplyingToFieldsNullUnmarshal(t *testing.T) {
+	input := []byte(`{
+		"code": 200,
+		"message": "OK",
+		"tweet": {
+			"id": "1",
+			"url": "https://x.com/example/status/1",
+			"text": "hello",
+			"author": {
+				"id": "1",
+				"name": "Example",
+				"screen_name": "example",
+				"avatar_url": "https://example.com/avatar.jpg",
+				"verified": false,
+				"blue_badge": false
+			},
+			"replies": 0,
+			"retweets": 0,
+			"likes": 0,
+			"created_at": "Mon Jan 02 15:04:05 -0700 2006",
+			"created_timestamp": 1,
+			"possibly_scam": false,
+			"possibly_sensitive": false,
+			"lang": "en",
+			"source": "web",
+			"replying_to": null,
+			"replying_to_status": null
+		}
+	}`)
+
+	var resp FxTwitterResponse
+	if err := json.Unmarshal(input, &resp); err != nil {
+		t.Fatalf("unmarshal error: %v", err)
+	}
+
+	if resp.Tweet == nil {
+		t.Fatalf("missing tweet data after unmarshal")
+	}
+
+	if resp.Tweet.ReplyingTo != nil {
+		t.Fatalf("expected replying_to to be nil, got %v", *resp.Tweet.ReplyingTo)
+	}
+	if resp.Tweet.ReplyingToStatus != nil {
+		t.Fatalf("expected replying_to_status to be nil, got %v", *resp.Tweet.ReplyingToStatus)
+	}
+}
+
 func TestFxTwitterMosaicFormatsUnmarshal(t *testing.T) {
 	input := []byte(`{
 		"code": 200,

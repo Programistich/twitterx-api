@@ -59,6 +59,8 @@ type Tweet struct {
 	PossiblySensitive bool         `json:"possibly_sensitive"`
 	Lang              string       `json:"lang"`
 	Source            string       `json:"source"`
+	ReplyingTo        *string      `json:"replying_to"`
+	ReplyingToStatus  *string      `json:"replying_to_status"`
 	Media             *Media       `json:"media,omitempty"`
 	Poll              *Poll        `json:"poll,omitempty"`
 	Quote             *Tweet       `json:"quote,omitempty"`
