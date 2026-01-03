@@ -1,0 +1,19 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "go test ./..."
+          },
+          {
+            "type": "command",
+            "command": "docker compose -f infra/docker-compose.yml -f infra/docker-compose.override.yml up -d --build"
+          }
+        ]
+      }
+    ]
+  }
+}
